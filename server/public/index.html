@@ -30,7 +30,7 @@
       output.innerHTML = "⏳ Generating clip...";
 
       try {
-        const res = await fetch("http://localhost:5000/api/clip", {
+        const res = await fetch("https://youtube-clip-downloader-q9hj.onrender.com/api/clip", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url, start, end }),
@@ -39,7 +39,7 @@
         const data = await res.json();
 
         if (res.ok) {
-          output.innerHTML = `<a href="http://localhost:5000${data.downloadUrl}" class="text-teal-400 underline">⬇️ Click here to download your clip</a>`;
+          output.innerHTML = `<a href="https://youtube-clip-downloader-q9hj.onrender.com${data.downloadUrl}" class="text-teal-400 underline">⬇️ Click here to download your clip</a>`;
         } else {
           output.innerHTML = `<span class="text-red-400">❌ Error: ${data.error}</span>`;
         }
