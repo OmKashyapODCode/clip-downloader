@@ -1,7 +1,7 @@
 import Clip from '../models/Clip.js';
 import { spawn } from 'child_process';
 
-// 🧮 Duration calculator
+//  Duration calculator
 function calculateDuration(start, end) {
   const parseTime = (t) => {
     const parts = t.split(':').map(Number);
@@ -16,7 +16,7 @@ function calculateDuration(start, end) {
   return endSec - startSec;
 }
 
-// 🎬 Create and store clip metadata only
+//  Create and store clip metadata only
 export const generateClip = async (req, res) => {
   try {
     const { url, start, end } = req.body;
@@ -41,12 +41,12 @@ export const generateClip = async (req, res) => {
       downloadUrl
     });
   } catch (err) {
-    console.error('🔥 Error:', err.message);
+    console.error(' Error:', err.message);
     res.status(500).json({ error: 'Server error', details: err.message });
   }
 };
 
-// 📥 Stream clip without saving file
+// Stream clip without saving file
 export const downloadAndDelete = async (req, res) => {
   try {
     const clip = await Clip.findOne({ downloadUrl: `/api/clip/download/${req.params.id}` });
@@ -74,9 +74,9 @@ export const downloadAndDelete = async (req, res) => {
     ytDlp.stdout.pipe(ffmpeg.stdin);
     ffmpeg.stdout.pipe(res);
 
-    // ✅ Catches broken pipe (EPIPE) if browser closes early
+    //  Catches broken pipe (EPIPE) if browser closes early
     res.on('error', (err) => {
-      console.error('❌ Response stream error:', err.message);
+      console.error(' Response stream error:', err.message);
       ytDlp.kill('SIGKILL');
       ffmpeg.kill('SIGKILL');
     });
@@ -84,29 +84,29 @@ export const downloadAndDelete = async (req, res) => {
     res.on('close', () => {
       ytDlp.kill('SIGKILL');
       ffmpeg.kill('SIGKILL');
-      console.log('⚠️ Client disconnected. Cleaned up processes.');
+      console.log(' Client disconnected. Cleaned up processes.');
     });
 
     ytDlp.stderr.on('data', (data) => console.log(`[yt-dlp] ${data}`));
     ffmpeg.stderr.on('data', (data) => console.log(`[ffmpeg] ${data}`));
 
     ytDlp.on('error', (err) => {
-      console.error('❌ yt-dlp failed:', err.message);
+      console.error(' yt-dlp failed:', err.message);
       try { res.end(); } catch {}
     });
 
     ffmpeg.on('error', (err) => {
-      console.error('❌ ffmpeg failed:', err.message);
+      console.error(' ffmpeg failed:', err.message);
       try { res.end(); } catch {}
     });
 
     ffmpeg.on('close', async () => {
       await Clip.findByIdAndDelete(clip._id);
-      console.log(`🗃️ Deleted DB record: ${clip._id}`);
+      console.log(` Deleted DB record: ${clip._id}`);
     });
 
   } catch (err) {
-    console.error('🔥 Download error:', err.message);
+    console.error(' Download error:', err.message);
     try { res.status(500).json({ error: 'Internal server error' }); } catch {}
   }
 };

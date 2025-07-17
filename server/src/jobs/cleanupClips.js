@@ -7,11 +7,11 @@ const TMP_DIR = path.join('tmp');
 
 // Run every hour
 cron.schedule('0 * * * *', async () => {
-  console.log('🧹 Running temp folder cleanup...');
+  console.log(' Running temp folder cleanup...');
 
   fs.readdir(TMP_DIR, async (err, files) => {
     if (err) {
-      console.error('❌ Failed to read tmp folder:', err.message);
+      console.error(' Failed to read tmp folder:', err.message);
       return;
     }
 
@@ -24,18 +24,18 @@ cron.schedule('0 * * * *', async () => {
         // Delete file
         fs.unlink(filePath, async (err) => {
           if (err) {
-            console.warn(`❌ Failed to delete ${filePath}:`, err.message);
+            console.warn(` Failed to delete ${filePath}:`, err.message);
             return;
           }
 
-          console.log(`🗑️ Deleted old file: ${file}`);
+          console.log(` Deleted old file: ${file}`);
 
           // Extract ID from filename: clip_<id>.mp4
           const id = file.split('_')[1]?.split('.')[0];
           if (id) {
             const downloadUrl = `/api/clip/download/${id}`;
             await Clip.findOneAndDelete({ downloadUrl });
-            console.log(`🗃️ Deleted DB record for clip: ${downloadUrl}`);
+            console.log(` Deleted DB record for clip: ${downloadUrl}`);
           }
         });
       }
