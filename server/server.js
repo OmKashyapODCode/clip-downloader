@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
 import clipRoutes from './routes/clipRoutes.js';
-import './jobs/cleanupClips.js'; // background job
+import './jobs/cleanupClips.js';
 
 dotenv.config();
 const app = express();
@@ -20,18 +20,26 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: 'http://127.0.0.1:5500/server/public/index.html'
+  origin: ['http://localhost:5500', 'https://youtube-clip-downloader-q9hj.onrender.com']
 }));
 
 app.use(express.json());
 
-// Serve static files from /clips (if used)
+// Serve frontend from public folder
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve clips statically if needed
 app.use('/clips', express.static(path.join(__dirname, 'clips')));
 
 // API routes
 app.use('/api', clipRoutes);
 
-// Handle errors globally
+// Fallback route for any unknown routes (single page app support)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Global error handlers
 process.on('uncaughtException', err => {
   console.error('Uncaught Exception:', err.message);
 });
